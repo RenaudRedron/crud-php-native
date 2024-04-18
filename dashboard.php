@@ -9,7 +9,7 @@ if (getRole($pdo, $_SESSION['user']['login']) != 'admin') {
 
 $numberUser = countUser($pdo);
 $numberArticle = countArticle($pdo);
-$numberCategorie = countCategorie($pdo);
+$numberCategory = countCategory($pdo);
 $numberMarque = countMarque($pdo);
 
 include ('init/_header.php');
@@ -35,15 +35,15 @@ include ('init/_header.php');
         </div>
     </a>
 
-    <a class="p-2 m-2 bg-success col-lg-2 col-md-4 text-white text-center text-decoration-none" href="#">
+    <a class="p-2 m-2 bg-success col-lg-2 col-md-4 text-white text-center text-decoration-none" href="admin_categories.php">
         <div>
             <h4 class="p-2">Catégories</h4>
             <hr>
-            <p class="fs-4"><?= $numberCategorie; ?></p>
+            <p class="fs-4"><?= $numberCategory; ?></p>
         </div>
     </a>
 
-    <a class="p-2 m-2 bg-primary col-lg-2 col-md-4 text-white text-center text-decoration-none" href="#">
+    <a class="p-2 m-2 bg-primary col-lg-2 col-md-4 text-white text-center text-decoration-none" href="admin_marques.php">
         <div>
             <h4 class="p-2">Marques</h4>
             <hr>

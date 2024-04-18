@@ -7,27 +7,42 @@ if (getRole($pdo, $_SESSION['user']['login']) != 'admin') {
     header('Location: index.php');
 }
 
-$numberArticle = countArticle($pdo);
+// On récupére le nombre de catégorie
+$numberCategory = countCategory($pdo);
 
-if (isset($_GET['deleteArticleId'])) {
+// On initialise une variable pour le message d'erreur
+$categoryMessage = '';
 
-    // SI l'article à supprimer existe en base de données
-    if (findArticle($pdo, $_GET['deleteArticleId'])) {
-        deleteArticle($pdo, $_GET['deleteArticleId']);
+
+if (isset($_GET['deleteCategoryId'])) {
+
+    // SI la catégorie est utilisé dans un article
+    if (usedCategory($pdo, $_GET['deleteCategoryId'])) {
+        $categoryMessage = "<p class='text-danger text-center'>Il est impossible de supprimer une catégorie qui est liée à un article.</p>";
+    } else {   // SINON la catégorie n'est pas utilisé dans un article 
+
+        // SI la catégorie à supprimer existe en base de données
+        if (findCategory($pdo, $_GET['deleteCategoryId'])) {
+            deleteCategory($pdo, $_GET['deleteCategoryId']);
+        }
+
     }
 
 }
 
+
 include ('init/_header.php');
 ?>
 
-<h2 class="w-100 mx-auto text-center p-4">Articles (<?= $numberArticle; ?>)</h2>
+<h2 class="w-100 mx-auto text-center p-4">Catégories (<?= $numberCategory; ?>)</h2>
 
 <div class="w-75 mx-auto text-left m-2">
-    <a href="admin_create_article.php"><button class="btn bg-dark text-white">
-            Ajouter un article
+    <a href="admin_create_category.php"><button class="btn bg-dark text-white">
+            Ajouter une catégorie
         </button></a>
 </div>
+
+<?= $categoryMessage; ?>
 
 <div class="table-responsive">
 
@@ -35,10 +50,7 @@ include ('init/_header.php');
         <thead>
             <tr>
                 <th scope="col" class="text-center">ID</th>
-                <th scope="col" class="text-center">Catégorie</th>
-                <th scope="col" class="text-center">Marque</th>
                 <th scope="col" class="text-center">Nom</th>
-                <th scope="col" class="text-center">Prix (€)</th>
                 <th scope="col" class="text-center"><img src="public/images/modifier.png" alt="Bouton de modification"
                         width="25px"></th>
                 <th scope="col" class="text-center"><img src="public/images/supprimer.png" alt="Bouton de suppression"
@@ -46,19 +58,15 @@ include ('init/_header.php');
             </tr>
         </thead>
         <tbody>
-            <?php foreach (getArticles($pdo) as $article) { ?>
+            <?php foreach (getCategories($pdo) as $category) { ?>
                 <tr>
-                    <th scope="row" class="text-center p-4 align-middle"><?= $article['id_article']; ?></th>
-                    <td class="text-center p-4 align-middle"><?= getCategory($pdo, $article['id_category'])['name']; ?>
-                    </td>
-                    <td class="text-center p-4 align-middle"><?= getMarque($pdo, $article['id_marque'])['name']; ?></td>
-                    <td class="text-center p-4 align-middle"><?= htmlspecialchars($article['name']); ?></td>
-                    <td class="text-center p-4 align-middle"><?= $article['price']; ?></td>
+                    <th scope="row" class="text-center p-4 align-middle"><?= $category['id_category']; ?></th>
+                    <td class="text-center p-4 align-middle"><?= $category['name']; ?></td>
                     <td class="text-center p-4 align-middle"><a
-                            href="admin_update_article.php?id_article=<?= $article['id_article'] ?>"><img
+                            href="admin_update_category.php?id_category=<?= $category['id_category'] ?>"><img
                                 src="public/images/modifier.png" alt="Bouton de modification" width="25px"></a></td>
                     <td class="text-center p-4 align-middle"><a
-                            href="admin_articles.php?deleteArticleId=<?= $article['id_article'] ?>"><img
+                            href="admin_categories.php?deleteCategoryId=<?= $category['id_category'] ?>"><img
                                 src="public/images/supprimer.png" alt="Bouton de suppression" width="25px"></a></td>
                 </tr>
 

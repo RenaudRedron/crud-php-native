@@ -179,13 +179,45 @@ function countUser(object $pdo): int
 ###########################################################################
 ###########################################################################
 
+// Permet d'ajouter une nouvelle catégorie en base de données
+function createCategory(object $pdo, string $name): void
+{
+    $pdoStatement = $pdo->prepare("INSERT INTO category (name) VALUES (?)");
+    $pdoStatement->execute([$name]);
+
+    // redirection
+    header('Location: admin_categories.php'); 
+}
+
+// Permet de modifier une catégorie en base de données
+function updateCategory(object $pdo, string $id_category, string $name): void
+{
+
+    $pdoStatement = $pdo->prepare("UPDATE category SET name = ? WHERE id_category = ?");
+    $pdoStatement->execute([$name, $id_category]);
+
+    // redirection
+    header('Location: admin_categories.php'); 
+
+}
+
+// Permet de supprimé une catégorie de la base de données
+function deleteCategory(object $pdo, int $id_category): void
+{
+    $pdoStatement = $pdo->prepare("DELETE FROM category WHERE id_category = ?");
+    $pdoStatement->execute([$id_category]);
+
+    // redirection
+    header('Location: admin_categories.php');
+
+}
 
 // Permet de récuperé toute les catégories en base de données
 function getCategories(object $pdo): array
 {
 
     // On selectionne dans la table catégorie toute les entrées
-    $pdoStatement = $pdo->prepare("SELECT * FROM categorie ORDER BY name");
+    $pdoStatement = $pdo->prepare("SELECT * FROM category ORDER BY name");
     $pdoStatement->execute();
     $response = $pdoStatement->fetchAll();
 
@@ -194,23 +226,67 @@ function getCategories(object $pdo): array
 }
 
 // Permet de récuperé une catégorie en base de données avec l'ID
-function getCategorie(object $pdo, int $id_categorie): array
+function getCategory(object $pdo, int $id_category): array
 {
 
     // On selectionne dans la table catégorie l'entrée lié à l'ID
-    $pdoStatement = $pdo->prepare("SELECT * FROM categorie WHERE id_categorie = ?");
-    $pdoStatement->execute([$id_categorie]);
+    $pdoStatement = $pdo->prepare("SELECT * FROM category WHERE id_category = ?");
+    $pdoStatement->execute([$id_category]);
     $response = $pdoStatement->fetch();
 
     return $response;
 
 }
 
+// Permet de vérifier si une catégorie existe en base de donnée
+function findCategory(object $pdo, int $id_category): bool
+{
+    // Initialisation d'un variable booleen
+    $check = false;
+
+    // On selectionne dans la table categorie toute les entrées qui possède l'id
+    $pdoStatement = $pdo->prepare("SELECT * FROM category WHERE id_category = ?");
+    $pdoStatement->execute([$id_category]);
+    // On compte le nombre de ligne possèdent cette ID
+    $response = $pdoStatement->rowCount();
+
+    // SI rowCount() renvoi un resultat supérieur a zéro
+    if ($response > 0) {
+        // Alors oui au moins une entrée existe
+        $check = true;
+    }
+
+    // On retour le booleen
+    return $check;
+}
+
+// Permet de vérifier si une catégorie possède dejà le name choisi
+function findCategoryName(object $pdo, string $name): bool
+{
+    // Initialisation d'un variable booleen
+    $check = false;
+
+    // On selectionne dans la table categorie toute les entrées qui possède le name
+    $pdoStatement = $pdo->prepare("SELECT * FROM category WHERE name = ?");
+    $pdoStatement->execute([$name]);
+    // On compte le nombre de ligne possèdent cette ID
+    $response = $pdoStatement->rowCount();
+
+    // SI rowCount() renvoi un resultat supérieur a zéro
+    if ($response > 0) {
+        // Alors oui au moins une entrée existe
+        $check = true;
+    }
+
+    // On retour le booleen
+    return $check;
+}
+
 // Permet de connaitre le nombre de catégorie en base de données
-function countCategorie(object $pdo): int
+function countCategory(object $pdo): int
 {
     // On selectionne dans la table catégorie toute les entrées
-    $pdoStatement = $pdo->prepare("SELECT * FROM categorie");
+    $pdoStatement = $pdo->prepare("SELECT * FROM category");
     $pdoStatement->execute();
     // On compte le nombre de ligne
     $response = $pdoStatement->rowCount();
@@ -218,6 +294,28 @@ function countCategorie(object $pdo): int
     return $response;
 }
 
+// Permet de savoir si une catégorie est utilisé ( Avant de supprimé une catégorie )
+function usedCategory(object $pdo, int $id_category): bool {
+
+    // Initialisation d'un variable booleen
+    $check = false;
+
+    // On selectionne dans la table article toute les entrées qui possède l'id_catégorie
+    $pdoStatement = $pdo->prepare("SELECT * FROM article WHERE id_category = ?");
+    $pdoStatement->execute([$id_category]);
+    // On compte le nombre de ligne possèdent cette ID
+    $response = $pdoStatement->rowCount();
+
+    // SI rowCount() renvoi un resultat supérieur a zéro
+    if ($response > 0) {
+        // Alors oui au moins une entrée existe
+        $check = true;
+    }
+
+    // On retour le booleen
+    return $check;
+
+}
 
 ###########################################################################
 ###########################################################################
@@ -274,21 +372,21 @@ function countMarque(object $pdo): int
 ###########################################################################
 
 // Permet d'ajouter un nouvelle article en base de données
-function createArticle(object $pdo, string $name, int $id_categorie, int $id_marque, float $price, string $description = null): void
+function createArticle(object $pdo, string $name, int $id_category, int $id_marque, float $price, string $description = null): void
 {
-    $pdoStatement = $pdo->prepare("INSERT INTO article (name, id_categorie, id_marque, price, description) VALUES (?, ?, ?, ?, ?)");
-    $pdoStatement->execute([$name, $id_categorie, $id_marque, $price, $description]);
+    $pdoStatement = $pdo->prepare("INSERT INTO article (name, id_category, id_marque, price, description) VALUES (?, ?, ?, ?, ?)");
+    $pdoStatement->execute([$name, $id_category, $id_marque, $price, $description]);
 
     // redirection
     header('Location: admin_articles.php'); 
 }
 
 // Permet de modifier un article en base de données
-function updateArticle(object $pdo, string $id_article, string $name, int $id_categorie, int $id_marque, float $price, string $description = null): void
+function updateArticle(object $pdo, string $id_article, string $name, int $id_category, int $id_marque, float $price, string $description = null): void
 {
 
-    $pdoStatement = $pdo->prepare("UPDATE article SET name = ?, id_categorie = ?, id_marque = ?, price = ?, description = ? WHERE id_article = ?");
-    $pdoStatement->execute([$name, $id_categorie, $id_marque, $price, $description, $id_article]);
+    $pdoStatement = $pdo->prepare("UPDATE article SET name = ?, id_category = ?, id_marque = ?, price = ?, description = ? WHERE id_article = ?");
+    $pdoStatement->execute([$name, $id_category, $id_marque, $price, $description, $id_article]);
 
     // redirection
     header('Location: admin_articles.php'); 
@@ -341,12 +439,12 @@ function findArticle(object $pdo, int $id): bool
     // On selectionne dans la table article toute les entrées qui possède l'id
     $pdoStatement = $pdo->prepare("SELECT * FROM article WHERE id_article = ?");
     $pdoStatement->execute([$id]);
-    // On compte le nombre de ligne possèdent ce pseudo
+    // On compte le nombre de ligne possèdent cette ID
     $response = $pdoStatement->rowCount();
 
     // SI rowCount() renvoi un resultat supérieur a zéro
     if ($response > 0) {
-        // Alors oui au moins une entrée avec ce pseudo existe
+        // Alors oui au moins une entrée existe
         $check = true;
     }
 

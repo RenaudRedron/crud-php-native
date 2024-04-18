@@ -20,7 +20,7 @@ $article = getArticle($pdo, $_GET['id_article']);
 // On initialise plusieurs variable pour affiché des messages d'erreur quand le formulaire est mal rempli
 $nameMessage = '';
 $marqueMessage = '';
-$categorieMessage = '';
+$categoryMessage = '';
 $priceMessage = '';
 $descriptionMessage = '';
 $acces = true;
@@ -36,9 +36,9 @@ if ($_POST) {
     }
 
     // On vérifie qu'une catégorie soit choisi
-    if ($_POST["categorie"] == 0) {
+    if ($_POST["category"] == 0) {
         $acces = false;
-        $categorieMessage = "<p class='text-danger'>Une catégorie doit être choisi.</p>";
+        $categoryMessage = "<p class='text-danger'>Une catégorie doit être choisi.</p>";
     }
 
     // On vérifie qu'une marque soit choisi
@@ -62,8 +62,8 @@ if ($_POST) {
     // Si après toutes les vérifications du formulaire $acces est toujours TRUE
     if ($acces) {
 
-        // On créé un nouvelle article en base de données
-        updateArticle($pdo, $_GET['id_article'], $_POST["name"], $_POST["categorie"], $_POST["marque"], $_POST["price"], $_POST["description"]);
+        // On modifie un article en base de données
+        updateArticle($pdo, $_GET['id_article'], $_POST["name"], $_POST["category"], $_POST["marque"], $_POST["price"], $_POST["description"]);
 
     }
 
@@ -83,14 +83,14 @@ include ('init/_header.php');
     <input class="form-control " type="text" id="name" name="name" value=<?= $article['name']; ?>>
     <?= $nameMessage; ?>
 
-    <label class="form-label m-2" for="categorie">Catégorie* :</label>
-    <select class="form-select" id="categorie" name="categorie">
+    <label class="form-label m-2" for="category">Catégorie* :</label>
+    <select class="form-select" id="category" name="category">
         <option value="0" selected>...</option>
-        <?php foreach ($categories as $categorie) { ?>
-            <option value=<?= $categorie['id_categorie']; ?>><?= $categorie['name']; ?></option>
+        <?php foreach ($categories as $category) { ?>
+            <option value=<?= $category['id_category']; ?>><?= $category['name']; ?></option>
         <?php } ?>
     </select>
-    <?= $categorieMessage; ?>
+    <?= $categoryMessage; ?>
 
     <label class="form-label m-2" for="marque">Marque* :</label>
     <select class="form-select" id="marque" name="marque">
